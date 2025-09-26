@@ -28,10 +28,6 @@ The system continuously tracks and flags suspicious activities such as:
 
 It automatically generates **detailed PDF reports** containing alerts and an integrity score, while storing essential data in **MongoDB**.  
 
- **Live Demo**: [Video Proctoring System](https://v0-video-proctoring-ui-dun.vercel.app/)  
-
-> ⚠️ **Note:** The video proctoring module may take a short time to initialize. Please wait for setup to complete before testing.  
-
 ---
 
 ## Features
@@ -149,4 +145,10 @@ npm run dev
 * Build analytics dashboards for proctoring summaries.
 
 ---
+
+ **Live Demo**: [Video Proctoring System](https://v0-video-proctoring-ui-dun.vercel.app/)  
+
+> ⚠️ **Note:** The system requires a short initialization period after starting the video. Please allow it to finish setting up before running tests.
+
+
 
