@@ -3,7 +3,7 @@
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
-- [Architecture Overview](#architecture-overview)
+- [Architecture](#architecture)
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -11,18 +11,17 @@
 - [PDF Generation Notes](#pdf-generation-notes)
 - [Limitations](#limitations)
 - [Future Enhancements](#future-enhancements)
-- [Demo Video](#demo-video)
 
 ---
 
 ## Introduction
 
-This project is a web-based video proctoring system built using Next.js and React. It leverages:
+This project is a web-based video proctoring system built using Next.js. It leverages:
 
 - **TensorFlow.js COCO-SSD** for object detection  
 - **face-api.js** for facial recognition  
 
-The system monitors suspicious activities such as multiple faces, absence of the candidate, presence of prohibited items, and unexpected voices. It generates detailed multi-page PDF reports with alerts and integrity scores and stores session data in MongoDB via API.
+The system monitors suspicious activities such as multiple faces, absence of the candidate, presence of prohibited items. It generates detailed PDF reports with alerts and integrity scores and stores required data in MongoDB.
 
 ---
 
@@ -41,7 +40,7 @@ The system monitors suspicious activities such as multiple faces, absence of the
 
 ---
 
-## Architecture Overview
+## Architecture
 
 <img width="905" height="616" alt="image" src="https://github.com/user-attachments/assets/55030a06-4385-42f5-bbdf-eb24dea9f0f1" />
 
@@ -50,7 +49,6 @@ The system monitors suspicious activities such as multiple faces, absence of the
 ## Technologies Used
 
 - Next.js (Frontend & Backend)  
-- React.js  
 - face-api.js (facial detection)  
 - TensorFlow.js COCO-SSD (object detection)  
 - jsPDF (PDF generation)  
@@ -72,8 +70,8 @@ The system monitors suspicious activities such as multiple faces, absence of the
 1. Clone the repository:
 
 ```bash
-git clone https://your-repo-url.git
-cd your-repo-directory
+git clone https://github.com/Adityabandaru18/video-proctoring-system.git
+cd video-proctoring-system
 ````
 
 2. Install dependencies:
@@ -85,7 +83,7 @@ npm install
 3. Set up environment variables in `.env`:
 
 ```env
-MONGODB_URI="your_mongodb_connection_string"
+NEXT_PUBLIC_MONGODB_URI="your_mongodb_connection_string"
 ```
 ---
 
@@ -140,9 +138,4 @@ npm run dev
 * Build analytics dashboards for proctoring summaries.
 
 ---
-
-## Demo Video
-
-*A link to a demo video showcasing the system in action.*
-
 
