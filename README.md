@@ -8,26 +8,34 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
-- [PDF Generation Notes](#pdf-generation-notes)
+- [Report Generation Notes](#report-generation-notes)
 - [Limitations](#limitations)
 - [Future Enhancements](#future-enhancements)
 
 ---
 
-## Introduction
+## Introduction  
 
-This project is a web-based video proctoring system built using Next.js. It leverages:
+This project is a **web-based video proctoring system** developed with **Next.js**. It integrates:  
 
 - **TensorFlow.js COCO-SSD** for object detection  
 - **face-api.js** for facial recognition  
 
-The system monitors suspicious activities such as multiple faces, absence of the candidate, presence of prohibited items. It generates detailed PDF reports with alerts and integrity scores and stores required data in MongoDB.
+The system continuously tracks and flags suspicious activities such as:  
+- Multiple faces appearing in the frame  
+- Candidate absence  
+- Detection of restricted objects  
 
----
+It automatically generates **detailed PDF reports** containing alerts and an integrity score, while storing essential data in **MongoDB**.  
+
+ **Live Demo**: [Video Proctoring System](https://v0-video-proctoring-ui-dun.vercel.app/)  
+
+> ⚠️ **Note:** The video proctoring module may take a short time to initialize. Please wait for setup to complete before testing.  
+
 
 ## Features
 
-- Real-time webcam video monitoring for face, object, and audio detection  
+- Real-time webcam video monitoring for face and objectdetection  
 - Alerts for suspicious activities:
   - Absence of candidate
   - Multiple faces
@@ -99,6 +107,7 @@ npm run dev
 3. Enter the candidate’s name and start the session.
 4. The system will monitor for suspicious activities and logs them along with the timestamps.
 5. Stop the session to download the PDF report and the details are stored to the Database.
+6. Find the session details at [http://localhost:3000/api/logs](http://localhost:3000/api/logs)
 
 ---
 
@@ -106,6 +115,7 @@ npm run dev
 
 * `POST /api/logs` — Store proctoring session data
 * `GET /api/logs` — Retrieve stored session reports
+<img width="1384" height="455" alt="image" src="https://github.com/user-attachments/assets/0751181e-ef2e-4e12-83bb-2840a44c7522" />
 
 ---
 
