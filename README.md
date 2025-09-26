@@ -32,6 +32,7 @@ It automatically generates **detailed PDF reports** containing alerts and an int
 
 > ⚠️ **Note:** The video proctoring module may take a short time to initialize. Please wait for setup to complete before testing.  
 
+---
 
 ## Features
 
