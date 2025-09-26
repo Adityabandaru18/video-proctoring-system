@@ -5,9 +5,8 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'video proctoring system',
+  description: 'Video Proctoring System with Real-Time Detection and Reporting',
 }
 
 export default function RootLayout({
