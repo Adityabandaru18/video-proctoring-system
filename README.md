@@ -113,8 +113,8 @@ npm run dev
 
 ## API Endpoints
 
-* `POST /api/logs` — Store proctoring session data
-* `GET /api/logs` — Retrieve stored session reports
+* `POST /api/logs` — Store proctoring session data in MongoDB
+* `GET /api/logs` — Retrieve stored session reports, sorted by highest integrityScore first
 <img width="1384" height="455" alt="image" src="https://github.com/user-attachments/assets/0751181e-ef2e-4e12-83bb-2840a44c7522" />
 
 ---
