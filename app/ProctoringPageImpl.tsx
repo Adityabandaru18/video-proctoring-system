@@ -313,42 +313,11 @@ export default function ProctoringPage() {
     setAlerts((prev) => [{ message, timestamp }, ...prev]);
   };
 
-  // Store report data on backend
-  const storeReportInDB = async () => {
-    if (!candidateName.trim()) {
-      console.warn("Candidate name required to store report");
-      return;
-    }
-    const payload = {
-      candidateName,
-      startTime: startTimeRef.current,
-      endTime: endTimeRef.current,
-      focusLostCount: focusLostCountRef.current,
-      multipleFacesCount: multipleFacesCountRef.current,
-      objectAlertTypes: Array.from(objectAlertTypesRef.current),
-      alerts,
-      integrityScore: calcIntegrityScore(),
-    };
-    try {
-      const res = await fetch("/api/logs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!data.success) console.error("Failed to store report:", data.error);
-      else console.log("Report stored successfully");
-    } catch (error) {
-      console.error("Error storing report:", error);
-    }
-  };
-
   // Handle generate report button click
   const handleGenerateReportClick = async () => {
     setIsLoadingReport(true);
     try {
       generatePDFReport();
-      await storeReportInDB();
     } finally {
       setIsLoadingReport(false);
     }
