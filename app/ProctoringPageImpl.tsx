@@ -20,15 +20,15 @@ import {
 } from "lucide-react";
 
 export default function ProctoringPage() {
-
   // --------- State ---------
   const [candidateName, setCandidateName] = useState("");
   const [isRecording, setIsRecording] = useState(false);
-  const [alerts, setAlerts] = useState<{ message: string; timestamp: string }[]>([]);
+  const [alerts, setAlerts] = useState<
+    { message: string; timestamp: string }[]
+  >([]);
   const [showReportButton, setShowReportButton] = useState(false);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [isLoadingReport, setIsLoadingReport] = useState(false);
-  const [elapsed, setElapsed] = useState(0);
 
   // ---------- Refs ----------
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -51,7 +51,7 @@ export default function ProctoringPage() {
   const multipleFacesCountRef = useRef<number>(0);
   const objectAlertTypesRef = useRef<Set<string>>(new Set());
 
-  const lastAlertTimesRef = useRef<{[cls: string]: number}>({});
+  const lastAlertTimesRef = useRef<{ [cls: string]: number }>({});
 
   // Audio analysis refs
   const audioAnalyserRef = useRef<AnalyserNode | null>(null);
@@ -79,28 +79,15 @@ export default function ProctoringPage() {
     };
   }, [isRecording]);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (isRecording && startTimeRef.current) {
-      interval = setInterval(() => {
-        setElapsed(
-          Math.floor((Date.now() - (startTimeRef.current || 0)) / 1000)
-        );
-      }, 1000);
-    } else {
-      setElapsed(0);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isRecording]);
-
   // --------- Handlers and Functions ---------
 
   const startWebcam = async () => {
     try {
       setIsLoadingSession(true);
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
@@ -114,10 +101,19 @@ export default function ProctoringPage() {
         audioAnalyserRef.current.fftSize = 2048;
       }
       const audioTracks = stream.getAudioTracks();
-      if (audioTracks.length && audioContextRef.current && audioAnalyserRef.current) {
-        audioSourceRef.current = audioContextRef.current.createMediaStreamSource(new MediaStream(audioTracks));
+      if (
+        audioTracks.length &&
+        audioContextRef.current &&
+        audioAnalyserRef.current
+      ) {
+        audioSourceRef.current =
+          audioContextRef.current.createMediaStreamSource(
+            new MediaStream(audioTracks)
+          );
         audioSourceRef.current.connect(audioAnalyserRef.current);
-        audioDataArrayRef.current = new Uint8Array(audioAnalyserRef.current.frequencyBinCount);
+        audioDataArrayRef.current = new Uint8Array(
+          audioAnalyserRef.current.frequencyBinCount
+        );
       }
 
       mediaRecorderRef.current = new MediaRecorder(stream);
@@ -161,7 +157,10 @@ export default function ProctoringPage() {
       stream.getTracks().forEach((track) => track.stop());
       videoRef.current.srcObject = null;
     }
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !== "inactive"
+    ) {
       mediaRecorderRef.current.stop();
     }
     stopDetectionLoop();
@@ -215,7 +214,9 @@ export default function ProctoringPage() {
 
     prepareDetectionCanvas();
 
-    const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+    const detections = await faceapi
+      .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks();
     const now = Date.now();
 
     if (!detections || detections.length === 0) {
@@ -228,7 +229,10 @@ export default function ProctoringPage() {
     } else {
       lastFaceTimeRef.current = now;
       if (detections.length > 1) {
-        if (!lastAlertTimesRef.current["multiple_faces"] || now - lastAlertTimesRef.current["multiple_faces"] > HALF_SECOND) {
+        if (
+          !lastAlertTimesRef.current["multiple_faces"] ||
+          now - lastAlertTimesRef.current["multiple_faces"] > HALF_SECOND
+        ) {
           addAlert(`Multiple faces (${detections.length}) detected`);
           lastAlertTimesRef.current["multiple_faces"] = now;
           multipleFacesCountRef.current++;
@@ -245,7 +249,10 @@ export default function ProctoringPage() {
       const cls = obj.class.toLowerCase();
 
       if (ELECTRONIC_CLASSES.includes(cls)) {
-        if (!lastAlertTimesRef.current[cls] || now - lastAlertTimesRef.current[cls] > HALF_SECOND) {
+        if (
+          !lastAlertTimesRef.current[cls] ||
+          now - lastAlertTimesRef.current[cls] > HALF_SECOND
+        ) {
           addAlert(`Electronic device (${cls}) detected`);
           lastAlertTimesRef.current[cls] = now;
           objectAlertTypesRef.current.add(cls);
@@ -253,7 +260,10 @@ export default function ProctoringPage() {
       }
 
       if (cls === "book" || cls === "paper") {
-        if (!lastAlertTimesRef.current[cls] || now - lastAlertTimesRef.current[cls] > HALF_SECOND) {
+        if (
+          !lastAlertTimesRef.current[cls] ||
+          now - lastAlertTimesRef.current[cls] > HALF_SECOND
+        ) {
           addAlert("Book/paper detected");
           lastAlertTimesRef.current[cls] = now;
           objectAlertTypesRef.current.add("notes");
@@ -262,18 +272,6 @@ export default function ProctoringPage() {
     });
 
     detectionRequestRef.current = requestAnimationFrame(runDetection);
-  };
-
-  // Timer formatting helper
-  const formatElapsed = (seconds: number) => {
-    const h = Math.floor(seconds / 3600)
-      .toString()
-      .padStart(2, "0");
-    const m = Math.floor((seconds % 3600) / 60)
-      .toString()
-      .padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
-    return `${h}:${m}:${s}`;
   };
 
   const getDuration = () => {
@@ -290,7 +288,8 @@ export default function ProctoringPage() {
     let score = 100;
 
     if (objectAlertTypesRef.current.has("absence")) score -= 15;
-    if (multipleFacesCountRef.current > 0) score -= multipleFacesCountRef.current * 20;
+    if (multipleFacesCountRef.current > 0)
+      score -= multipleFacesCountRef.current * 20;
     if (objectAlertTypesRef.current.has("extra voice")) score -= 15;
     score -= focusLostCountRef.current * 5;
 
@@ -298,7 +297,11 @@ export default function ProctoringPage() {
       if (alert.message.toLowerCase().includes("cell phone")) score -= 10;
       if (alert.message.toLowerCase().includes("laptop")) score -= 10;
       if (alert.message.toLowerCase().includes("monitor")) score -= 10;
-      if (alert.message.toLowerCase().includes("book") || alert.message.toLowerCase().includes("notes")) score -= 10;
+      if (
+        alert.message.toLowerCase().includes("book") ||
+        alert.message.toLowerCase().includes("notes")
+      )
+        score -= 10;
     });
 
     return Math.max(0, Math.min(100, score));
@@ -386,14 +389,25 @@ export default function ProctoringPage() {
     y += LINE_HEIGHT;
 
     const suspiciousEvents: string[] = [];
-    if (multipleFacesCountRef.current > 0) suspiciousEvents.push("Multiple faces detected");
-    if (objectAlertTypesRef.current.has("absence")) suspiciousEvents.push("Candidate absent");
-    if (objectAlertTypesRef.current.has("cell phone")) suspiciousEvents.push("Mobile phone detected");
-    if (objectAlertTypesRef.current.has("laptop")) suspiciousEvents.push("Laptop detected");
-    if (objectAlertTypesRef.current.has("computer")) suspiciousEvents.push("Extra computer detected");
-    if (objectAlertTypesRef.current.has("monitor")) suspiciousEvents.push("Extra monitor detected");
-    if (objectAlertTypesRef.current.has("book") || objectAlertTypesRef.current.has("notes")) suspiciousEvents.push("Notes/book detected");
-    if (objectAlertTypesRef.current.has("extra voice")) suspiciousEvents.push("Extra voice detected");
+    if (multipleFacesCountRef.current > 0)
+      suspiciousEvents.push("Multiple faces detected");
+    if (objectAlertTypesRef.current.has("absence"))
+      suspiciousEvents.push("Candidate absent");
+    if (objectAlertTypesRef.current.has("cell phone"))
+      suspiciousEvents.push("Mobile phone detected");
+    if (objectAlertTypesRef.current.has("laptop"))
+      suspiciousEvents.push("Laptop detected");
+    if (objectAlertTypesRef.current.has("computer"))
+      suspiciousEvents.push("Extra computer detected");
+    if (objectAlertTypesRef.current.has("monitor"))
+      suspiciousEvents.push("Extra monitor detected");
+    if (
+      objectAlertTypesRef.current.has("book") ||
+      objectAlertTypesRef.current.has("notes")
+    )
+      suspiciousEvents.push("Notes/book detected");
+    if (objectAlertTypesRef.current.has("extra voice"))
+      suspiciousEvents.push("Extra voice detected");
 
     doc.setFont("helvetica", "bold");
     doc.text("Suspicious Events:", 14, y);
@@ -486,18 +500,11 @@ export default function ProctoringPage() {
       alert("Please enter candidate name before starting the session.");
       return;
     }
-    setIsLoadingSession(true);
     setIsRecording(true);
-    setIsLoadingSession(false);
   };
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8 relative">
-      <div className="absolute right-6 top-6 flex items-center gap-2 bg-card px-4 py-2 rounded shadow text-lg font-mono z-10 border border-border">
-        <span>⏱️</span>
-        <span>{formatElapsed(elapsed)}</span>
-      </div>
-
       <h1 className="text-3xl font-bold text-center mb-8 text-foreground">
         Video Proctoring System
       </h1>
@@ -520,11 +527,18 @@ export default function ProctoringPage() {
       <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
         <Card className="flex-1 bg-card shadow-lg">
           <CardHeader>
-            <CardTitle className="text-xl text-foreground">Candidate Video</CardTitle>
+            <CardTitle className="text-xl text-foreground">
+              Candidate Video
+            </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center p-4">
             <div className="w-full aspect-video bg-muted rounded-md overflow-hidden mb-4">
-              <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                muted
+                playsInline
+              />
             </div>
             <div className="flex gap-4">
               <Button
@@ -532,8 +546,12 @@ export default function ProctoringPage() {
                 disabled={isRecording || isLoadingSession}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                {isLoadingSession ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {isLoadingSession ? "Starting..." : "Start Recording & Detection"}
+                {isLoadingSession ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                {isLoadingSession
+                  ? "Starting..."
+                  : "Start Recording & Detection"}
               </Button>
               <Button
                 onClick={stopWebcam}
@@ -548,29 +566,54 @@ export default function ProctoringPage() {
 
         <Card className="flex-1 bg-card shadow-lg">
           <CardHeader>
-            <CardTitle className="text-xl text-foreground">Real-Time Alerts</CardTitle>
+            <CardTitle className="text-xl text-foreground">
+              Real-Time Alerts
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
             <div className="h-[290px] overflow-y-auto border border-border rounded-md p-2 bg-muted">
               {alerts.length === 0 ? (
-                <p className="text-muted-foreground text-center py-4">No alerts yet.</p>
+                <p className="text-muted-foreground text-center py-4">
+                  No alerts yet.
+                </p>
               ) : (
                 <ul className="space-y-2">
                   {alerts.map((alert, index) => {
-                    let icon = <AlertTriangle className="inline w-4 h-4 mr-2 text-orange-500" />;
+                    let icon = (
+                      <AlertTriangle className="inline w-4 h-4 mr-2 text-orange-500" />
+                    );
                     const msg = alert.message.toLowerCase();
                     if (msg.includes("cell phone") || msg.includes("mobile"))
-                      icon = <Smartphone className="inline w-4 h-4 mr-2 text-blue-500" />;
+                      icon = (
+                        <Smartphone className="inline w-4 h-4 mr-2 text-blue-500" />
+                      );
                     else if (msg.includes("laptop"))
-                      icon = <Laptop className="inline w-4 h-4 mr-2 text-blue-500" />;
-                    else if (msg.includes("monitor") || msg.includes("computer"))
-                      icon = <Monitor className="inline w-4 h-4 mr-2 text-blue-500" />;
-                    else if (msg.includes("book") || msg.includes("paper") || msg.includes("notes"))
-                      icon = <BookOpen className="inline w-4 h-4 mr-2 text-green-600" />;
+                      icon = (
+                        <Laptop className="inline w-4 h-4 mr-2 text-blue-500" />
+                      );
+                    else if (
+                      msg.includes("monitor") ||
+                      msg.includes("computer")
+                    )
+                      icon = (
+                        <Monitor className="inline w-4 h-4 mr-2 text-blue-500" />
+                      );
+                    else if (
+                      msg.includes("book") ||
+                      msg.includes("paper") ||
+                      msg.includes("notes")
+                    )
+                      icon = (
+                        <BookOpen className="inline w-4 h-4 mr-2 text-green-600" />
+                      );
                     else if (msg.includes("multiple faces"))
-                      icon = <Users className="inline w-4 h-4 mr-2 text-purple-600" />;
+                      icon = (
+                        <Users className="inline w-4 h-4 mr-2 text-purple-600" />
+                      );
                     else if (msg.includes("no face"))
-                      icon = <EyeOff className="inline w-4 h-4 mr-2 text-gray-600" />;
+                      icon = (
+                        <EyeOff className="inline w-4 h-4 mr-2 text-gray-600" />
+                      );
 
                     return (
                       <li
@@ -578,7 +621,8 @@ export default function ProctoringPage() {
                         className="bg-orange-100 text-orange-800 border border-orange-200 p-3 rounded-md text-sm font-medium animate-in fade-in slide-in-from-top-2 flex items-center"
                       >
                         {icon}
-                        <span className="mr-2">[{alert.timestamp}]</span> {alert.message}
+                        <span className="mr-2">[{alert.timestamp}]</span>{" "}
+                        {alert.message}
                       </li>
                     );
                   })}
@@ -591,7 +635,9 @@ export default function ProctoringPage() {
                 disabled={isLoadingReport}
                 className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
-                {isLoadingReport ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {isLoadingReport ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
                 {isLoadingReport ? "Generating..." : "Generate Report"}
               </Button>
             )}
